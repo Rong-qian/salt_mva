@@ -1,45 +1,4 @@
-name: GN2X
-
-data:
-  train_file: /share/lustre/svanstroud/data/xbb/ext_v1/pp_output_train.h5
-  val_file: /share/lustre/svanstroud/data/xbb/ext_v1/pp_output_val.h5
-  norm_dict: /share/lustre/svanstroud/data/xbb/ext_v1/norm_dict.yaml
-  class_dict: /share/lustre/svanstroud/data/xbb/ext_v1/class_dict.yaml
-  #move_files_temp: /dev/shm/svanstro/salt/xbb/
-  variables:
-    jets:
-      - pt
-      - eta
-      - mass
-    tracks:
-      - d0
-      - z0SinTheta
-      - dphi
-      - deta
-      - qOverP
-      - IP3D_signed_d0_significance
-      - IP3D_signed_z0_significance
-      - phiUncertainty
-      - thetaUncertainty
-      - qOverPUncertainty
-      - numberOfPixelHits
-      - numberOfSCTHits
-      - numberOfInnermostPixelLayerHits
-      - numberOfNextToInnermostPixelLayerHits
-      - numberOfInnermostPixelLayerSharedHits
-      - numberOfInnermostPixelLayerSplitHits
-      - numberOfPixelSharedHits
-      - numberOfPixelSplitHits
-      - numberOfSCTSharedHits
-  num_train: -1
-  num_val: -1
-  num_test: -1
-  batch_size: 1000
-  num_workers: 15
-
-trainer:
-  max_epochs: 50
-  devices: 2
+name: GN3-dev
 
 model:
   lrs_config:
@@ -47,9 +6,13 @@ model:
     max: 5e-4
     end: 1e-5
     pct_start: 0.01
+    weight_decay: 1e-5
+
   model:
     class_path: salt.models.SaltModel
     init_args:
+      num_register_tokens: 10
+
       init_nets:
         - input_name: tracks
           dense_config:
@@ -81,10 +44,10 @@ model:
                 label: flavour_label
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
-                  init_args: { weight: [2.75, 1.0, 1.52, 1.52] }
-                dense_config:
+                  init_args: { weight: [1.0, 2.0, 2.0] }
+                dense_config: &task_dense_config
                   input_size: *out_dim
-                  output_size: 4
+                  output_size: 3
                   hidden_layers: [128, 64, 32]
                   activation: *activation
 
@@ -97,13 +60,11 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [4.37, 194.0, 1.0, 17.78, 12.25, 13.28, 1.0, 22.46]
+                    weight: [4.2, 73.7, 1.0, 17.5, 12.3, 12.5, 141.7, 22.3]
                 dense_config:
-                  input_size: 128
-                  context_size: 128
+                  <<: *task_dense_config
                   output_size: 8
-                  hidden_layers: [128, 64, 32]
-                  activation: *activation
+                  context_size: *out_dim
 
             - class_path: salt.models.VertexingTask
               init_args:
@@ -115,8 +76,50 @@ model:
                   class_path: torch.nn.BCEWithLogitsLoss
                   init_args: { reduction: none }
                 dense_config:
+                  <<: *task_dense_config
                   input_size: 256
-                  context_size: *out_dim
-                  hidden_layers: [128, 64, 32]
                   output_size: 1
-                  activation: *activation
+                  context_size: *out_dim
+
+data:
+  variables:
+    jets:
+      - pt_btagJes
+      - eta_btagJes
+    tracks:
+      - d0
+      - z0SinTheta
+      - dphi
+      - deta
+      - qOverP
+      - IP3D_signed_d0_significance
+      - IP3D_signed_z0_significance
+      - phiUncertainty
+      - thetaUncertainty
+      - qOverPUncertainty
+      - numberOfPixelHits
+      - numberOfSCTHits
+      - numberOfInnermostPixelLayerHits
+      - numberOfNextToInnermostPixelLayerHits
+      - numberOfInnermostPixelLayerSharedHits
+      - numberOfInnermostPixelLayerSplitHits
+      - numberOfPixelSharedHits
+      - numberOfPixelSplitHits
+      - numberOfSCTSharedHits
+      #- numberOfTRTHits
+      #- leptonID
+
+  train_file: /unix/atlastracking/samples/ftag_dumps/vertexing/output/pp_output_train.h5
+  val_file: /unix/atlastracking/samples/ftag_dumps/vertexing/output/pp_output_val.h5
+  norm_dict: /unix/atlastracking/samples/ftag_dumps/vertexing/output/norm_dict.yaml
+  class_dict: /unix/atlastracking/samples/ftag_dumps/vertexing/output/class_dict.yaml
+  #move_files_temp: /dev/shm/svanstro/salt/gn2/
+
+  batch_size: 1000
+  num_workers: 40
+
+trainer:
+  max_epochs: 40
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed
