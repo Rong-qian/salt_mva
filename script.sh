@@ -1,0 +1,1 @@
+salt fit --config salt/configs/GN2_tttt_all_2class_SR_edge/GNT_SR_2class_edge_04_00_0001/fold0.yaml --force > logs/GNT_SR_2class_edge_04_00_0001_fold0.txt 2>&1 &
