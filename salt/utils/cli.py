@@ -84,6 +84,7 @@ class SaltCLI(LightningCLI):
             # https://github.com/pytorch/pytorch/pull/97565
             # https://github.com/pytorch/pytorch/issues/101107
             model.model = torch.compile(model.model)
+        print("!!!DEBUG: cli L77")
         self.trainer.fit(model, **kwargs)
 
     def before_instantiate_classes(self) -> None:
@@ -277,11 +278,16 @@ class SaltCLI(LightningCLI):
         sc = self.config[self.subcommand] if self.subcommand else self.config
         for task in sc.model.model.init_args.tasks.init_args.modules:
             t_args = task.init_args
+            print("!!!DEBUG: ", f"{sc.data.global_object}_classification")
+            print("!!!DEBUG", t_args.name)
+            print("!!!DEBUG: ", t_args.label)
+            print("!!!DEBUG: ", t_args.class_names)
             if not (
                 t_args.name == f"{sc.data.global_object}_classification"
                 and t_args.label == "flavour_label"
                 and t_args.class_names is None
             ):
+                print("!!!DEBUG: cil.py L248")
                 return
             name = sc.data.input_map[t_args.input_name] if sc.data.input_map else t_args.input_name
             with h5py.File(sc.data.train_file) as f:

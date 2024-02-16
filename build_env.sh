@@ -8,4 +8,4 @@ python -m pip install -e . --no-cache-dir
 
 python -m pip install pandas  --no-cache-dir
 conda install pytables 
-
+pip install -r requirements.txt --no-cache-dir
