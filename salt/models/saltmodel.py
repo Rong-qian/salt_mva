@@ -63,7 +63,6 @@ class SaltModel(nn.Module):
             self.init_featurewise(featurewise_nets, init_nets, encoder)
 
         self.init_nets = nn.ModuleList([InitNet(**init_net) for init_net in init_nets])
-        print("!!!DEBUG: saltmodel L58")
         self.tasks = tasks
         self.encoder = encoder
         self.mask_decoder = mask_decoder
@@ -182,7 +181,6 @@ class SaltModel(nn.Module):
         preds["embed_xs"] = maybe_flatten_tensors(preds["embed_xs"])
 
         for task in self.tasks:
-            print("!!!DEBUG: saltmodel L176")
             if task.input_name == task.global_object:
                 task_preds, task_loss = task(preds["global_rep"], labels, None, context=None)
             elif task.input_name == "objects":
