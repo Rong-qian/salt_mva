@@ -55,7 +55,6 @@ class SaltModel(nn.Module):
         super().__init__()
 
         self.init_nets = nn.ModuleList([InitNet(**init_net) for init_net in init_nets])
-        print("!!!DEBUG: saltmodel L58")
         self.tasks = tasks
         self.encoder = encoder
         self.pool_net = pool_net
@@ -174,7 +173,6 @@ class SaltModel(nn.Module):
             embed_x = torch.cat(list(embed_x.values()), dim=1)
 
         for task in self.tasks:
-            print("!!!DEBUG: saltmodel L176")
             if task.input_name == task.global_object:
                 task_preds, task_loss = task(global_rep, labels, None, context=None)
             else:
