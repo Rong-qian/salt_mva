@@ -20,6 +20,7 @@ def run_train(tmp_path, config_path, train_args, do_xbb=False, do_muP=False):
     nd_path = tmp_path / "dummy_norm_dict.yaml"
     cd_path = tmp_path / "dummy_class_dict.yaml"
     write_dummy_norm_dict(nd_path, cd_path)
+    print("!!!DEBUG: test_pipeline L23")
     write_dummy_file(train_h5_path, nd_path, do_xbb, incl_taus)
 
     args = ["fit"]

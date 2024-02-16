@@ -17,7 +17,7 @@ model:
             output_size: &embed_dim 32
             hidden_layers: [32]
             activation: &activation ReLU
-            norm_layer: &norm_layer LayerNorm
+            # norm_layer: &# norm_layer LayerNorm
         - input_name: EDGE
           attach_global: True
           dense_config:
@@ -25,7 +25,7 @@ model:
             output_size: &edge_embed_dim 64
             hidden_layers: [64]
             activation: *activation
-            norm_layer: *norm_layer
+            # norm_layer: *# norm_layer
 
       encoder:
         class_path: salt.models.TransformerEncoder
@@ -39,7 +39,7 @@ model:
             num_heads: 8
             attention: { class_path: salt.models.ScaledDotProductAttention }
           dense_config:
-            norm_layer: *norm_layer
+            # norm_layer: *# norm_layer
             activation: *activation
             dropout: &dropout 0.1
 
@@ -53,7 +53,7 @@ model:
           modules:
             - class_path: salt.models.ClassificationTask
               init_args:
-                name: jet_classification
+                name: jets_classification
                 input_name: jets
                 label: flavour_label
                 #use_class_dict_weights: True

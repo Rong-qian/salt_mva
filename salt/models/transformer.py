@@ -186,6 +186,7 @@ class TransformerEncoder(nn.Module):
         ])
         self.final_norm = nn.LayerNorm(embed_dim)
 
+        print("!!!DEBUG: transformer L189")
         # For resizing the output tokens
         if self.muP:
             assert self.out_dim, "Need the out_dim layer for muP, \
