@@ -60,7 +60,7 @@ model:
                 #sample_weight: weight
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
-                  init_args: { weight: [1.0, 1.0] } # this is used to change the class weight, when use_class_dict_weights: False
+                  init_args: { weight: [2.32, 1.0] } # this is used to change the class weight, when use_class_dict_weights: False
                 dense_config: &task_dense_config
                   input_size: 131 # *out_dim + nGLOBAL
                   output_size: 2
