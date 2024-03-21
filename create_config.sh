@@ -1,7 +1,7 @@
-# BTAGNAME=(Legacy60 Legacy70 Legacy77 Legacy85 Alias60 Alias70 Alias77 Alias85)
-# nBTagsVar=(nBTags_GN2v00LegacyWP_60 nBTags_GN2v00LegacyWP_70 nBTags_GN2v00LegacyWP_77 nBTags_GN2v00LegacyWP_85 nBTags_GN2v00NewAliasWP_60 nBTags_GN2v00NewAliasWP_70 nBTags_GN2v00NewAliasWP_77 nBTags_GN2v00NewAliasWP_85)
-BTAGNAME=(Legacy77)
-nBTagsVar=(nBTags_GN2v00LegacyWP_77)
+BTAGNAME=(Legacy60 Legacy70 Legacy77 Legacy85 Alias60 Alias70 Alias77 Alias85)
+nBTagsVar=(nBTags_GN2v00LegacyWP_60 nBTags_GN2v00LegacyWP_70 nBTags_GN2v00LegacyWP_77 nBTags_GN2v00LegacyWP_85 nBTags_GN2v00NewAliasWP_60 nBTags_GN2v00NewAliasWP_70 nBTags_GN2v00NewAliasWP_77 nBTags_GN2v00NewAliasWP_85)
+# BTAGNAME=(Legacy77)
+# nBTagsVar=(nBTags_GN2v00LegacyWP_77)
 
 folder=GN2_ttZp_all_2class_SR_edge
 
