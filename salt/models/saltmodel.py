@@ -1,8 +1,9 @@
 import torch
 from torch import Tensor, cat, nn
 
-from salt.models import InitNet, Pooling
+from salt.models import FeaturewiseTransformation, InitNet, Pooling
 from salt.stypes import BoolTensors, NestedTensors, Tensors
+from salt.utils.tensor_utils import flatten_tensor_dict, maybe_flatten_tensors
 
 
 class SaltModel(nn.Module):
@@ -11,9 +12,11 @@ class SaltModel(nn.Module):
         init_nets: list[dict],
         tasks: nn.ModuleList,
         encoder: nn.Module = None,
+        mask_decoder: nn.Module = None,
         pool_net: Pooling = None,
         num_register_tokens: int = 0,
         merge_dict: dict[str, list[str]] | None = None,
+        featurewise_nets: list[dict] | None = None,
     ):
         """A generic multi-modal, multi-task neural network.
 
@@ -25,7 +28,7 @@ class SaltModel(nn.Module):
 
         Parameters
         ----------
-        init_nets : nn.ModuleList
+        init_nets : list[dict]
             Keyword arguments for one or more initialisation networks.
             See [`salt.models.InitNet`][salt.models.InitNet].
             Each initialisation network produces an initial input embedding for
@@ -38,6 +41,9 @@ class SaltModel(nn.Module):
             Main input encoder, which takes the output of the initialisation
             networks and produces a single embedding for each constituent.
             If not provided this model is essentially a DeepSets model.
+        mask_decoder : nn.Module
+            Mask decoder, which takes the output of the encoder and produces a
+            series of learned embeddings to represent object masks
         pool_net : nn.Module
             Pooling network which computes a global representation of the object
             by aggregating over the constituents. If not provided, assume that
@@ -51,17 +57,39 @@ class SaltModel(nn.Module):
             representations of the inputs in list[str] and act on them
             in following layers (e.g. transformer or tasks) as if they
             are coming from one input type
+        featurewise_nets : list[dict]
+            Keyword arguments for featurewise transformation networks that perform
+            featurewise scaling and biasing.
         """
         super().__init__()
+
+        self.featurewise_nets = None
+        if featurewise_nets:
+            self.featurewise_nets = nn.ModuleList([
+                FeaturewiseTransformation(**featurewise_net) for featurewise_net in featurewise_nets
+            ])
+        self.featurewise_nets_map = (
+            {featurewise_net.layer: featurewise_net for featurewise_net in self.featurewise_nets}
+            if self.featurewise_nets
+            else {}
+        )
+        # if available, add featurewise net to init net config
+        if "input" in self.featurewise_nets_map:
+            for init_net in init_nets:
+                init_net["featurewise"] = self.featurewise_nets_map["input"]
 
         self.init_nets = nn.ModuleList([InitNet(**init_net) for init_net in init_nets])
         self.tasks = tasks
         self.encoder = encoder
+        self.mask_decoder = mask_decoder
+
         self.pool_net = pool_net
         self.merge_dict = merge_dict
         self.num_register_tokens = num_register_tokens
 
         # init register tokens
+        if self.num_register_tokens and not self.encoder:
+            raise ValueError("encoder must be set if num_register_tokens is set")
         if self.num_register_tokens and self.encoder:
             self.registers = torch.nn.Parameter(
                 torch.normal(
@@ -114,6 +142,7 @@ class SaltModel(nn.Module):
         """
         # initial input projections
         xs = {}
+
         for init_net in self.init_nets:
             xs[init_net.input_name] = init_net(inputs)
 
@@ -141,42 +170,59 @@ class SaltModel(nn.Module):
                             var: cat([labels[mt][var] for mt in merge_types], dim=1)
                         })
 
-        # input embedding
-        embed_xs = self.encoder(xs, pad_mask=pad_masks, **kwargs) if self.encoder else xs
+        # Generate embedding from encoder, or by concatenating the init net outputs
+        if self.encoder:
+            preds = {"embed_xs": self.encoder(xs, pad_mask=pad_masks, **kwargs)}
+        else:
+            preds = {"embed_xs": flatten_tensor_dict(xs)}
+
+        preds, labels, loss = (
+            self.mask_decoder(preds, self.tasks, pad_masks, labels)
+            if self.mask_decoder
+            else (preds, labels, {})
+        )
+
+        # apply featurewise transformation to global track representations if configured
+        if "global" in self.featurewise_nets_map:
+            preds["embed_xs"] = self.featurewise_nets_map["global"](inputs, preds["embed_xs"])
 
         # pooling
         if self.pool_net:
-            global_rep = self.pool_net(embed_xs, pad_mask=pad_masks)
+            global_rep = self.pool_net(preds, pad_mask=pad_masks)
         else:
-            global_rep = xs[self.global_object]
+            global_rep = preds["embed_xs"]
 
         # add global features to global representation
         if (global_feats := inputs.get("GLOBAL")) is not None:
             global_rep = torch.cat([global_rep, global_feats], dim=-1)
+        preds["global_rep"] = global_rep
 
         # run tasks
-        preds, loss = self.run_tasks(global_rep, embed_xs, pad_masks, labels)
+        task_preds, task_loss = self.run_tasks(preds, pad_masks, labels)
+        preds.update(task_preds)
+        loss.update(task_loss)
 
         return preds, loss
 
     def run_tasks(
         self,
-        global_rep: Tensor,
-        embed_x: Tensor,
+        preds: dict[str, Tensor],
         masks: BoolTensors | None,
         labels: NestedTensors | None = None,
     ):
-        preds: NestedTensors = {}
         loss = {}
 
-        if isinstance(embed_x, dict):
-            embed_x = torch.cat(list(embed_x.values()), dim=1)
+        preds["embed_xs"] = maybe_flatten_tensors(preds["embed_xs"])
 
         for task in self.tasks:
             if task.input_name == task.global_object:
-                task_preds, task_loss = task(global_rep, labels, None, context=None)
+                task_preds, task_loss = task(preds["global_rep"], labels, None, context=None)
+            elif task.input_name == "objects":
+                task_preds, task_loss = task(preds["objects"]["embed"], labels, masks, context=None)
             else:
-                task_preds, task_loss = task(embed_x, labels, masks, context=global_rep)
+                task_preds, task_loss = task(
+                    preds["embed_xs"], labels, masks, context=preds["global_rep"]
+                )
             if task.input_name not in preds:
                 preds[task.input_name] = {}
             preds[task.input_name][task.name] = task_preds

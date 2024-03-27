@@ -242,19 +242,12 @@ Alternatively, each input type can be updated with separate self-attention block
         dropout: &dropout 0.1
 ```
 
-#### Parameterised GNN
+#### Parameterisation
 
-It is possible to condition the network output on particular variables (such as an exotic particles mass) to create a so-called *parameterised  neural network*, as described by [Baldi et al](https://arxiv.org/pdf/1601.07913.pdf). Parameters are treated as additional input variables during training and the user can chose which values to use when evaluating the model.
+It is possible to condition the network output on particular variables (such as an exotic particles mass) to create a so-called *parameterised  neural network*. Parameters are treated as additional input variables during training and the user can chose which values to use when evaluating the model.
 
 A parameterised network can be configured in the following way:
 
-- `inputs` section: Specify the collection containing the parameters.
-    ```yaml
-    input_names:
-        ...
-        PARAMETERS: jets
-        ...
-    ```
 - `variables` section: Add your parameters to lists of variables used in training.
     ```yaml
     data:
@@ -273,11 +266,33 @@ A parameterised network can be configured in the following way:
             prob: [0.2, 0.3, 0.5]
     ```
 
-!!! warning "Ensure `concat_jet_tracks` is set to `true` when using parameters"
+The implementation above produces the default parameterisation mechanism in which parameters are concatenated to the inputs of the model, as described by [Baldi et al](https://arxiv.org/pdf/1601.07913.pdf). Alternatively, one may instead apply feature wise transformations, as described
+by [Dumoulin et al](https://distill.pub/2018/feature-wise-transformations/). Here, parameters are passed as inputs to seperate networks whose outputs can be used to scale or bias the features of a layer. To use feature transformations you must add `featurewise_nets` to your models configuration as follows:
 
 
+```yaml
+  model:
+    class_path: salt.models.SaltModel
+    init_args:
+    ...     
+      featurewise_nets:
+        - layer: input
+          dense_config_scale:
+            hidden_layers: [4]
+            output_size: 17
+          dense_config_bias:
+            hidden_layers: [4]
+            output_size: 17
+        - layer: global
+          dense_config_scale:
+            output_size: 128
+            hidden_layers: [64]
+            final_activation: Sigmoid
+    ...
+```
 
-
+Here, two instances of featurewise transformations have been added to the model. For each, you must specify the layer whose features you would
+like to transform (this can currently be either `input`, which applies the transformations to the features before they are passed into the initialisation network, or `global`, which applies them to the global track representations outputted by the encoder). For each instance, you can specify either one or both of `dense_config_scale` or `dense_config_bias`, which configure dense networks whose output scales and biases the features of the chosen layer, respectively. It is important to ensure the `output_size` of these networks matches the number of features in the layer you are transforming. In this case, the transformations are applied to a model with 17 inputs per track, and an encoder that outputs 128 features for each track representation. 
 
 
 ### Training
@@ -285,11 +300,34 @@ A parameterised network can be configured in the following way:
 #### Compiled Models
 
 Pytorch 2.0 introduced compiled models via `torch.compile()` which improves execution times.
-In tests, compilation can decrease the time to train GN2 by 30%.
+In tests, compilation can increase the execution speed of the model by up to 1.5x.
 You can enable compilation by passing the `--compile` flag to the CLI.
 You may see some warnings printed at the start of training, and the first step will take a while as the model is JIT compiled.
 
-!!! warning "Exporting compiled models to ONNX is not currently supported."
+??? failure "If you see `g++` compile errors, you may need to update your compiler"
+
+    You can check your `g++`/`gcc` version with `g++ --version`.
+    To use `torch.compile()`, you'll need `gcc` version 10 or later.
+
+    You can install a more recent version with
+    ```bash
+    conda install -c conda-forge cxx-compiler
+    ```
+
+??? abstract "`torch.compile()` results"
+
+    The following results were obtained on a single A100 GPU
+    with a batch size of 5,000 and 40 workers.
+
+    | Model      | Eager    | `torch.compile()` | Speedup |
+    | ---------- | -------- | ----------------- | ------- |
+    | GN3 No Aux | 8.9 it/s | 15.4 it/s         | 1.73x   |
+    | GN3        | 6.4 it/s | 9.0  it/s         | 1.41x   |
+
+    Memory usage should be unaffected by compiling the model.
+    Please report any issues you may have
+
+!!! warning "`torch.compile()` has not been tested with mutli GPU training"
 
 
 ### Hyperparameter Optimisation

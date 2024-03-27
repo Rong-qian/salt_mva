@@ -109,6 +109,7 @@ ELECTRON_VARS = [
     "f3",
 ]
 
+HADRON_VARS = ["pt", "Lxy", "deta", "dphi", "mass"]
 rng = np.random.default_rng(42)
 torch.manual_seed(42)
 
@@ -164,6 +165,7 @@ def get_dummy_inputs(n_jets=1000, n_jet_features=2, n_track_features=21, n_track
     shapes_tracks = {
         "inputs": [n_jets, n_tracks_per_jet, n_jet_features + n_track_features],
         "labels/ftagTruthOriginLabel": [n_jets, n_tracks_per_jet],
+        "labels/ftagTruthParentBarcode": [n_jets, n_tracks_per_jet],
         "labels/ftagTruthVertexIndex": [n_jets, n_tracks_per_jet],
         "labels/truthOriginLabel": [n_jets, n_tracks_per_jet],
         "labels/truthVertexIndex": [n_jets, n_tracks_per_jet],
@@ -188,7 +190,7 @@ def get_dummy_inputs(n_jets=1000, n_jet_features=2, n_track_features=21, n_track
     return jets, tracks
 
 
-def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
+def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False, inc_params=False):
     """TODO: merge with atlas-ftag-tools test file generation."""
     with open(sd_fname) as f:
         sd = yaml.safe_load(f)
@@ -233,6 +235,8 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
         "Xbb2020v3_QCD",
     ]
 
+    params = ["mass"]
+
     track_vars = list(sd["tracks"])
     electron_vars = list(sd["electrons"])
 
@@ -243,7 +247,8 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
     track_features = len(track_vars)
     n_electrons_per_jet = 10
     electron_features = len(electron_vars)
-
+    n_hadrons_per_jet = 5
+    hadron_features = len(HADRON_VARS)
     # setup jets
     shapes_jets = {
         "inputs": [n_jets, jet_features + 2],
@@ -251,13 +256,23 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
 
     # setup tracks
     shapes_tracks = {
-        "inputs": [n_jets, n_tracks_per_jet, track_features + 2],
+        "inputs": [n_jets, n_tracks_per_jet, track_features + 3],
         "valid": [n_jets, n_tracks_per_jet],
     }
 
     shapes_electrons = {
         "inputs": [n_jets, n_electrons_per_jet, electron_features + 2],
         "valid": [n_jets, n_electrons_per_jet],
+    }
+
+    shapes_hadrons = {
+        "inputs": [n_jets, n_hadrons_per_jet, hadron_features + 2],
+        "valid": [n_jets, n_hadrons_per_jet],
+    }
+
+    # setup parameters
+    shapes_params = {
+        "inputs": [n_jets, len(params)],
     }
 
     # setup jets
@@ -270,16 +285,35 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
     if make_xbb:
         jets["flavour_label"] = rng.choice([0, 1, 2, 3], size=n_jets)
     else:
-        # jets["flavour_label"] = rng.choice([0, 1, 2], size=n_jets)
         jets["flavour_label"] = rng.choice([0, 1], size=n_jets) #!!! 2-class training
+      # jets["flavour_label"] = rng.choice([0, 1, 2], size=n_jets) # original
+
     jets["HadronConeExclTruthLabelID"] = rng.choice([0, 4, 5], size=n_jets)
     jets["HadronConeExclTruthLabelLxy"][jets["flavour_label"] == 0] = np.nan
+
+    # setup hadrons
+    hadrons_dtype = np.dtype(
+        [(n, "f4") for n in HADRON_VARS] + [("barcode", "i4"), ("flavour", "i4")]
+    )
+    hadrons = rng.random(shapes_hadrons["inputs"])
+    valid = rng.choice([True, False], size=shapes_hadrons["valid"])
+    valid = np.sort(valid, axis=-1)[:, ::-1].view(dtype=np.dtype([("valid", bool)]))
+    hadrons[~valid["valid"]] = np.nan
+    hadrons = u2s(hadrons, hadrons_dtype)
+    hadrons = join_structured_arrays([hadrons, valid])
+    hadrons["barcode"] = rng.integers(0, 10000, size=(n_jets, n_hadrons_per_jet))
+    hadrons["barcode"][~hadrons["valid"]] = -1
+    hadrons["flavour"] = rng.choice([-1, 4, 5], size=(n_jets, n_hadrons_per_jet))
+    hadrons["flavour"] = np.sort(hadrons["flavour"], axis=-1)[:, ::-1]
+    hadrons["flavour"][~hadrons["valid"]] = -1
+
     # setup tracks
     tracks_dtype = np.dtype(
         [(n, "f4") for n in track_vars]
         + [
             ("ftagTruthOriginLabel", "i4"),
             ("ftagTruthVertexIndex", "i4"),
+            ("ftagTruthParentBarcode", "i4"),
         ]
     )
     tracks = rng.random(shapes_tracks["inputs"])
@@ -288,6 +322,11 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
     tracks[~valid["valid"]] = np.nan
     tracks = u2s(tracks, tracks_dtype)
     tracks = join_structured_arrays([tracks, valid])
+    hadron_track_select = rng.choice(np.arange(5), size=(n_jets, n_tracks_per_jet))
+    track_barcodes = hadrons["barcode"][np.arange(n_jets)[:, None], hadron_track_select]
+    tracks["ftagTruthParentBarcode"] = track_barcodes
+    tracks["ftagTruthParentBarcode"][~tracks["valid"]] = -1
+
     # setup electrons
     electrons_dtype = np.dtype(
         [(n, "f4") for n in electron_vars]
@@ -302,6 +341,13 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
     valid = np.sort(valid, axis=-1)[:, ::-1].view(dtype=np.dtype([("valid", bool)]))
     electrons = join_structured_arrays([electrons, valid])
 
+    # setup parameters
+    params_dtype = np.dtype([(n, "f4") for n in params])
+    params = rng.random(shapes_params["inputs"])
+    params = u2s(params, params_dtype)
+    if inc_params:
+        params["mass"] = rng.choice([5, 16, 25, 40, 55], size=(n_jets))
+
     with h5py.File(fname, "w") as f:
         f.attrs["unique_jets"] = len(jets)
         f.attrs["config"] = "{}"
@@ -315,6 +361,9 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False):
         f.create_dataset("tracks", data=tracks)
         f.create_dataset("electrons", data=electrons)
         f.create_dataset("flow", data=tracks)
+        f.create_dataset("truth_hadrons", data=hadrons)
+        if inc_params:
+            f.create_dataset("PARAMETERS", data=params)
 
 
 def as_half(typestr) -> np.dtype:
