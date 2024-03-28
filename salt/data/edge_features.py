@@ -66,29 +66,33 @@ def get_inputs_edge(batch, variables):
             )
         if "msquare" in variables:
             Etot = np.expand_dims(batch["e"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1) + np.expand_dims(batch["e"].astype(ebatch.dtype), 2).repeat(
-                batch.shape[1], 2)
+                batch.shape[1], 1
+                ) + np.expand_dims(batch["e"].astype(ebatch.dtype), 2).repeat(
+                    batch.shape[1], 2)
             pxtot = np.expand_dims(batch["pt"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1) * np.cos(np.expand_dims(batch["phi"].astype(
-                ebatch.dtype), 1).repeat(
-                batch.shape[1], 1)) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
-                batch.shape[1], 2) * np.cos(np.expand_dims(batch["phi"].astype(
-                ebatch.dtype), 2).repeat(
-                batch.shape[1], 2))
+                batch.shape[1], 1
+                ) * np.cos(np.expand_dims(batch["phi"].astype(ebatch.dtype), 1).repeat(
+                    batch.shape[1], 1
+                    )) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
+                        batch.shape[1], 2
+                        ) * np.cos(np.expand_dims(batch["phi"].astype(ebatch.dtype), 2).repeat(
+                            batch.shape[1], 2))
             pytot = np.expand_dims(batch["pt"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1) * np.sin(np.expand_dims(batch["phi"].astype(
-                ebatch.dtype), 1).repeat(
-                batch.shape[1], 1)) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
-                batch.shape[1], 2) * np.sin(np.expand_dims(batch["phi"].astype(
-                ebatch.dtype), 2).repeat(
-                batch.shape[1], 2))
+                batch.shape[1], 1
+                ) * np.sin(np.expand_dims(batch["phi"].astype(ebatch.dtype), 1).repeat(
+                    batch.shape[1], 1
+                    )) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
+                        batch.shape[1], 2
+                        ) * np.sin(np.expand_dims(batch["phi"].astype(ebatch.dtype), 2).repeat(
+                            batch.shape[1], 2))
             pztot = np.expand_dims(batch["pt"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1) * np.sinh(np.expand_dims(batch["eta"].astype(
-                ebatch.dtype), 1).repeat(
-                batch.shape[1], 1)) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
-                batch.shape[1], 2) * np.sinh(np.expand_dims(batch["eta"].astype(
-                ebatch.dtype), 2).repeat(
-                batch.shape[1], 2))
+                batch.shape[1], 1
+                ) * np.sinh(np.expand_dims(batch["eta"].astype(ebatch.dtype), 1).repeat(
+                    batch.shape[1], 1
+                    )) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
+                        batch.shape[1], 2
+                        ) * np.sinh(np.expand_dims(batch["eta"].astype(ebatch.dtype), 2).repeat(
+                            batch.shape[1], 2))
         # calculate edge feature information and fill batch
         for i, variable in enumerate(variables):
             if variable == "dR":
