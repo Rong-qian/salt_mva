@@ -19,7 +19,7 @@ def get_dtype_edge(ds, variables) -> np.dtype:
         elif variable == "dphi":
             req_vars.extend(["phi"])
         elif variable == "msquare":
-            req_vars.extend(["eta", "phi", "pt","e"])
+            req_vars.extend(["eta", "phi", "pt", "e"])
         elif variable == "z":
             req_vars.extend(["pt"])
         elif variable == "kt":
@@ -98,8 +98,8 @@ def get_inputs_edge(batch, variables):
             elif variable == "dphi":
                 ebatch[:, :, :, i] = np.log(np.sqrt(np.square(dphi)))
             elif variable == "msquare":
-                E_minus_p = np.square(Etot) - (np.square(pxtot) 
-                                               + np.square(pytot) + np.square(pztot))
+                E_minus_p = np.square(Etot) - \
+                (np.square(pxtot) + np.square(pytot) + np.square(pztot))
                 negative_mask = E_minus_p < 0
                 sqrt_E_minus_p = np.sqrt(np.abs(E_minus_p))
                 sqrt_E_minus_p[negative_mask] *= -1
