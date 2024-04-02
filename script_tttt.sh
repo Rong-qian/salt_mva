@@ -1,0 +1,1 @@
+salt fit --config /atlas/data19/huichil/salt/salt/configs/tttt_all_4class_SR/tttt_all_4class_SR_Legacy77_v1/fold0.yaml --force > logs/tttt_all_4class_SR_Legacy77_v1_fold0.txt 2>&1
