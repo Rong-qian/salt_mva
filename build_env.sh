@@ -3,6 +3,7 @@ conda create -n salt python=3.10
 conda activate salt
 conda install jsonnet
 conda install chardet
+conda install uproot
 
 python -m pip install -e . --no-cache-dir
 
