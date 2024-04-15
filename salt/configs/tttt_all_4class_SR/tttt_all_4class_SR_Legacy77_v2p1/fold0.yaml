@@ -1,4 +1,4 @@
-name: tttt_all_4class_SR_Legacy77_v2_fold0
+name: tttt_all_4class_SR_Legacy77_v2p1_fold0
 
 model:
   lrs_config:
@@ -75,7 +75,7 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [1.72, 1.02, 1.0]
+                    weight: [0, 1.02, 1.0]
                 dense_config:
                   input_size: 131
                   output_size: 3
@@ -93,7 +93,7 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [3.12, 1.0, 10.77]
+                    weight: [0, 1.0, 10.77]
                 dense_config:
                   input_size: 131
                   output_size: 3
@@ -111,7 +111,7 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [2.06, 1.0, 1.53]
+                    weight: [0, 1.0, 1.53]
                 dense_config:
                   input_size: 131
                   output_size: 3
@@ -129,7 +129,7 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [3.36, 1.0, 66.54]
+                    weight: [0, 1.0, 66.54]
                 dense_config:
                   input_size: 131
                   output_size: 3
@@ -147,7 +147,7 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [1.89, 64.57, 1.0]
+                    weight: [0, 64.57, 1.0]
                 dense_config:
                   input_size: 131
                   output_size: 3
@@ -165,7 +165,7 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [1.89, 1.0, 64.57]
+                    weight: [0, 1.0, 64.57]
                 dense_config:
                   input_size: 131
                   output_size: 3

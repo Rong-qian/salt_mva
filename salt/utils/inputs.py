@@ -285,8 +285,8 @@ def write_dummy_file(fname, sd_fname, make_xbb=False, inc_taus=False, inc_params
     if make_xbb:
         jets["flavour_label"] = rng.choice([0, 1, 2, 3], size=n_jets)
     else:
-        jets["flavour_label"] = rng.choice([0, 1], size=n_jets)  # !!! customized change
-    # jets["flavour_label"] = rng.choice([0, 1, 2], size=n_jets)  # original
+        jets["flavour_label"] = rng.choice([0, 1, 2, 3], size=n_jets)  # !!! customized change
+        # jets["flavour_label"] = rng.choice([0, 1, 2], size=n_jets)  # original
 
     jets["HadronConeExclTruthLabelID"] = rng.choice([0, 4, 5], size=n_jets)
     jets["HadronConeExclTruthLabelLxy"][jets["flavour_label"] == 0] = np.nan

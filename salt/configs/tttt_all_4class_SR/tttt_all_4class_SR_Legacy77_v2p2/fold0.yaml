@@ -1,4 +1,4 @@
-name: tttt_all_4class_SR_Legacy77_v2_fold0
+name: tttt_all_4class_SR_Legacy77_v2p2_fold0
 
 model:
   lrs_config:
@@ -66,41 +66,41 @@ model:
                   activation: *activation
                   dropout: *dropout
 
-            - class_path: salt.models.ClassificationTask
-              init_args:
-                name: TruthFlavourJets_isLight
-                input_name: tracks
-                label: isLight  # -2:non-match -1:padding 0:not_light 1:is_light
-                weight: 0.05
-                loss:
-                  class_path: torch.nn.CrossEntropyLoss
-                  init_args:
-                    weight: [1.72, 1.02, 1.0]
-                dense_config:
-                  input_size: 131
-                  output_size: 3
-                  context_size: *out_dim
-                  hidden_layers: [128, 64, 32]
-                  activation: *activation
-                  dropout: *dropout
+            # - class_path: salt.models.ClassificationTask
+            #   init_args:
+            #     name: TruthFlavourJets_isLight
+            #     input_name: tracks
+            #     label: isLight  # -2:non-match -1:padding 0:not_light 1:is_light
+            #     weight: 0.05
+            #     loss:
+            #       class_path: torch.nn.CrossEntropyLoss
+            #       init_args:
+            #         weight: [1.72, 1.02, 1.0]
+            #     dense_config:
+            #       input_size: 131
+            #       output_size: 3
+            #       context_size: *out_dim
+            #       hidden_layers: [128, 64, 32]
+            #       activation: *activation
+            #       dropout: *dropout
 
-            - class_path: salt.models.ClassificationTask
-              init_args:
-                name: TruthFlavourJets_isCharm
-                input_name: tracks
-                label: isCharm  # -2:non-match -1:padding 0:not_charm 1:is_charm
-                weight: 0.05
-                loss:
-                  class_path: torch.nn.CrossEntropyLoss
-                  init_args:
-                    weight: [3.12, 1.0, 10.77]
-                dense_config:
-                  input_size: 131
-                  output_size: 3
-                  context_size: *out_dim
-                  hidden_layers: [128, 64, 32]
-                  activation: *activation
-                  dropout: *dropout
+            # - class_path: salt.models.ClassificationTask
+            #   init_args:
+            #     name: TruthFlavourJets_isCharm
+            #     input_name: tracks
+            #     label: isCharm  # -2:non-match -1:padding 0:not_charm 1:is_charm
+            #     weight: 0.05
+            #     loss:
+            #       class_path: torch.nn.CrossEntropyLoss
+            #       init_args:
+            #         weight: [3.12, 1.0, 10.77]
+            #     dense_config:
+            #       input_size: 131
+            #       output_size: 3
+            #       context_size: *out_dim
+            #       hidden_layers: [128, 64, 32]
+            #       activation: *activation
+            #       dropout: *dropout
 
             - class_path: salt.models.ClassificationTask
               init_args:
@@ -120,23 +120,23 @@ model:
                   activation: *activation
                   dropout: *dropout
 
-            - class_path: salt.models.ClassificationTask
-              init_args:
-                name: TruthFlavourJets_isTau
-                input_name: tracks
-                label: isTau  # -2:non-match -1:padding 0:not_tau 1:is_tau
-                weight: 0.05
-                loss:
-                  class_path: torch.nn.CrossEntropyLoss
-                  init_args:
-                    weight: [3.36, 1.0, 66.54]
-                dense_config:
-                  input_size: 131
-                  output_size: 3
-                  context_size: *out_dim
-                  hidden_layers: [128, 64, 32]
-                  activation: *activation
-                  dropout: *dropout
+            # - class_path: salt.models.ClassificationTask
+            #   init_args:
+            #     name: TruthFlavourJets_isTau
+            #     input_name: tracks
+            #     label: isTau  # -2:non-match -1:padding 0:not_tau 1:is_tau
+            #     weight: 0.05
+            #     loss:
+            #       class_path: torch.nn.CrossEntropyLoss
+            #       init_args:
+            #         weight: [3.36, 1.0, 66.54]
+            #     dense_config:
+            #       input_size: 131
+            #       output_size: 3
+            #       context_size: *out_dim
+            #       hidden_layers: [128, 64, 32]
+            #       activation: *activation
+            #       dropout: *dropout
 
             - class_path: salt.models.ClassificationTask
               init_args:
