@@ -23,26 +23,58 @@ CLASS_NAMES = {
         "ttV",
         "otherbkg",
     ],
-    "truthflav":[
-        "NonJet",
-        "light",
-        "charm",
-        "bottom",
-        "tau",
+    "isLight":[
+        "NonMatch",
+        "False",
+        "True",
     ],
-    "truth_label":[
-        # "NonMatch",
-        "Top",
-        "Higgs",
-        "Z",
+    "isCharm":[
+        "NonMatch",
+        "False",
+        "True",
     ],
-    "truth_vertex":[
+    "isBottom":[
+        "NonMatch",
+        "False",
+        "True",
+    ],
+    "isTau":[
+        "NonMatch",
+        "False",
+        "True",
+    ],
+    "isFromTop":[
+        "NonMatch",
+        "False",
+        "True",
+    ],
+    "isFromH":[
+        "NonMatch",
+        "False",
+        "True",
+    ],
+    # "isFromZ":[
+    #     "NonMatch",
+    #     "False",
+    #     "True",
+    # ],
+    "vertex_Tops":[
         "NonMatch",
         "First",
         "Second",
         "Third",
         "Fourth",
     ],
+    "vertex_Higgs":[
+        "NonMatch",
+        "First",
+        "Second",
+    ],
+    # "vertex_Zs":[
+    #     "NonMatch",
+    #     "First",
+    #     "Second",
+    # ],
     # "originIndexZp":[
     #     "NonMatch",
     #     "FirstZp",
