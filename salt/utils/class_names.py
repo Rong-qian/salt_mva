@@ -23,6 +23,11 @@ CLASS_NAMES = {
         "ttV",
         "otherbkg",
     ],
+    "truth_label":[
+        "NonMatch",
+        "Top",
+        "Higgs",
+    ],
     "isLight":[
         "NonMatch",
         "False",
@@ -96,9 +101,18 @@ CLASS_NAMES = {
     #     "ThirdW",
     #     "FourthW",
     # ],
-
-  
-    
-
-
+    "truthflav":[
+        "NonJet",
+        "light",
+        "charm",
+        "bottom",
+        "tau",
+    ],
+    "truth_vertex":[
+        "NonMatch",
+        "First",
+        "Second",
+        "Third",
+        "Fourth",
+    ],
 }
