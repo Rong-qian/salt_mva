@@ -177,9 +177,3 @@ trainer:
     - class_path: salt.callbacks.PredictionWriter
       init_args:
         write_tracks: True
-        extra_vars:
-          tracks:
-            - truth_label
-            - vertex_Tops
-            - vertex_Higgs
-
