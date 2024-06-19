@@ -1,4 +1,4 @@
-name: tttt_all_4class_SR_Legacy77_v3_fold2
+name: tttt_all_4class_SR_Legacy77_v3p2_fold0
 
 model:
   lrs_config:
@@ -149,7 +149,6 @@ data:
       - isEl
       - isMu
       - isJet
-      - isBottom
     EDGE:
       - dR
       - z
@@ -159,10 +158,10 @@ data:
       - msquare
 
 
-  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold2/pp_output_train.h5
-  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold2/pp_output_val.h5
-  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold2/norm_dict.yaml
-  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold2/class_dict.yaml
+  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold0/pp_output_train.h5
+  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold0/pp_output_val.h5
+  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold0/norm_dict.yaml
+  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/SM4top-SSML_noIso_LeptonPt15GeV_p5855_weight_VTX_v2/VTX_common_SR_4class_Legacy77_v3/preprocess_fold0/class_dict.yaml
 
   batch_size: 512
   num_workers: 40
@@ -172,10 +171,4 @@ trainer:
   accelerator: gpu
   devices: 1
   precision: 16-mixed
-
-  callbacks:
-    - class_path: salt.callbacks.PredictionWriter
-      init_args:
-        write_tracks: True
-
 
