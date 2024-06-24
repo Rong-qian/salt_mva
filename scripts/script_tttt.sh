@@ -17,3 +17,8 @@ salt fit --config /atlas/data19/huichil/salt/salt/configs/tttt_all_4class_SR/ttt
 salt fit --config /atlas/data19/huichil/salt/salt/configs/tttt_all_4class_SR/tttt_all_4class_SR_Legacy77_v4/fold0.yaml --force > logs/tttt_all_4class_SR_Legacy77_v4_fold0.txt 2>&1
 salt fit --config /atlas/data19/huichil/salt/salt/configs/tttt_all_4class_SR/tttt_all_4class_SR_Legacy77_v4p1/fold0.yaml --force > logs/tttt_all_4class_SR_Legacy77_v4p1_fold0.txt 2>&1
 
+# # TopCPToolkit samples (no EDGE features, no auxoliary tasks)
+
+salt fit --config /atlas/data19/huichil/salt/salt/configs/tttt_all_4class_SR/tttt_all_4class_SR_GN2v01WP85_v4p2/fold0.yaml --force > logs/tttt_all_4class_SR_GN2v01WP85_v4p2_fold0.txt 2>&1
+
+
