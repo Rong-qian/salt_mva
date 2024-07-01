@@ -1,4 +1,4 @@
-name: tttt_all_4class_SR_GN2v01WP85_v4p3_fold0
+name: tttt_all_4class_SR_GN2v01WP85_v4p4_fold0
 
 model:
   lrs_config:
@@ -64,6 +64,25 @@ model:
                   # input_size: 131 # *out_dim + nGLOBAL
                   input_size: *out_dim
                   output_size: 4
+                  hidden_layers: [128, 64, 32]
+                  activation: *activation
+                  dropout: *dropout
+
+            - class_path: salt.models.ClassificationTask
+              init_args:
+                name: TruthBjet
+                input_name: tracks
+                label: isBottom  # -2:non-match 1:from_Top 2:from_Higgs
+                weight: 0.3
+                loss:
+                  class_path: torch.nn.CrossEntropyLoss
+                  init_args:
+                    weight: [1.0,2.54]
+                dense_config:
+                  # input_size: 131
+                  input_size: *out_dim
+                  output_size: 2
+                  context_size: *out_dim
                   hidden_layers: [128, 64, 32]
                   activation: *activation
                   dropout: *dropout
@@ -157,7 +176,6 @@ data:
       - isEl
       - isMu
       - isJet
-      - isBottom
     # EDGE:
     #   - dR
     #   - z

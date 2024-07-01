@@ -135,6 +135,11 @@
   cuts: []
   colour: "#FF0000"
   category: tttt-analysis
+- name: tttt_ttt
+  label: tttt_ttt
+  cuts: []
+  colour: "#00F2FF"
+  category: tttt-analysis
 - name: tttt
   label: tttt
   cuts: []

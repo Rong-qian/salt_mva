@@ -17,9 +17,15 @@ CLASS_NAMES = {
         "Electron",
         "Muon",
     ],
+    # "flavour_label":[
+	# 	"tttt",
+    #     "ttt",
+    #     "ttV",
+    #     "otherbkg",
+    # ],
     "flavour_label":[
-		"tttt",
-        "ttt",
+		"ttZp_mZp1000",
+        "tttt_ttt",
         "ttV",
         "otherbkg",
     ],
@@ -39,7 +45,7 @@ CLASS_NAMES = {
         "True",
     ],
     "isBottom":[
-        "NonMatch",
+        # "NonMatch",
         "False",
         "True",
     ],
