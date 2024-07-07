@@ -84,6 +84,12 @@ def parse_args(args):
         help="Run with uncomitted changes.",
         action="store_true",
     )
+    parser.add_argument(
+        "-task_name",
+        "--task_name",
+        help="customalized classification task name",
+        required=False,
+    )
 
     return parser.parse_args(args)
 
@@ -94,9 +100,10 @@ def get_probs(outputs: Tensor):
 
 
 class ONNXModel(ModelWrapper):
-    def __init__(self, name: str | None = None, include_aux: bool = False, **kwargs) -> None:
+    def __init__(self, name: str | None = None, task_name: str | None = None, include_aux: bool = False, **kwargs) -> None:
         super().__init__(**kwargs)
         self.name = name if name else self.name
+        self.task_name = task_name if task_name else self.global_object
         assert len(self.model.init_nets) == 1, "Multi input ONNX models are not yet supported."
         assert "_" not in self.name, "Model name cannot contain underscores."
         assert "-" not in self.name, "Model name cannot contain dashes."
@@ -161,7 +168,7 @@ class ONNXModel(ModelWrapper):
 
         # get class probabilities
         onnx_outputs = get_probs(
-            outputs[self.global_object][f"{self.global_object}_classification"]
+            outputs[self.global_object][f"{self.task_name}_classification"]
         )
 
         # add aux outputs
@@ -182,7 +189,7 @@ class ONNXModel(ModelWrapper):
         return onnx_outputs
 
 
-def compare_output(pt_model, onnx_session, include_aux, n_track=40):
+def compare_output(task_name, pt_model, onnx_session, include_aux, n_track=40):
     n_batch = 1
 
     jets, tracks, pad_mask = inputs_sep_with_pad(
@@ -191,7 +198,7 @@ def compare_output(pt_model, onnx_session, include_aux, n_track=40):
 
     inputs_pt = {"jets": jets, "tracks": tracks}
     outputs_pt = pt_model(inputs_pt, {"tracks": pad_mask})[0]
-    pred_pt_jc = [p.detach().numpy() for p in get_probs(outputs_pt["jets"]["jets_classification"])]
+    pred_pt_jc = [p.detach().numpy() for p in get_probs(outputs_pt["jets"][f"{task_name}_classification"])]
 
     inputs_onnx = {
         "jet_features": jets.numpy(),
@@ -245,7 +252,7 @@ def compare_output(pt_model, onnx_session, include_aux, n_track=40):
         )
 
 
-def compare_outputs(pt_model, onnx_path, include_aux):
+def compare_outputs(task_name, pt_model, onnx_path, include_aux):
     print("\n" + "-" * 100)
     print("Validating ONNX model...")
 
@@ -257,7 +264,7 @@ def compare_outputs(pt_model, onnx_path, include_aux):
     )
     for n_track in tqdm(range(40), leave=False):
         for _ in range(10):
-            compare_output(pt_model, session, include_aux, n_track)
+            compare_output(task_name, pt_model, session, include_aux, n_track)
 
     print(
         "Success! Pytorch and ONNX models are consistent, but you should verify this in"
@@ -290,6 +297,7 @@ def main(args=None):
         onnx_model = ONNXModel.load_from_checkpoint(
             args.ckpt_path,
             name=args.name,
+            task_name=args.task_name,
             include_aux=args.include_aux,
             map_location=torch.device("cpu"),
         )
@@ -328,7 +336,7 @@ def main(args=None):
     )
 
     # validate pytorch and exported onnx models
-    compare_outputs(pt_model, onnx_path, args.include_aux)
+    compare_outputs(args.task_name, pt_model, onnx_path, args.include_aux)
     print("\n" + "-" * 100)
     print(f"Done! Saved ONNX model at {onnx_path}")
     print("-" * 100)
