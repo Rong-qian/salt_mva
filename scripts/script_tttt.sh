@@ -33,3 +33,12 @@ salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZ
 salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4/fold1.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4_fold1.txt 2>&1
 salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4/fold2.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4_fold2.txt 2>&1
 salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4/fold3.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4_fold3.txt 2>&1
+
+# ttZp: try increase the weight
+# 10%
+salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4p2/fold0.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4p2_fold0.txt 2>&1
+salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4p2/fold1.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4p2_fold1.txt 2>&1
+salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4p2/fold2.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4p2_fold2.txt 2>&1
+salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4p2/fold3.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4p2_fold3.txt 2>&1
+# 20%
+salt fit --config /atlas/data19/huichil/salt/salt/configs/ttZp_all_4class_SR/ttZp_all_4class_SR_GN2v01WP85_v4p4p3/fold0.yaml --force > logs/ttZp_all_4class_SR_GN2v01WP85_v4p4p3_fold0.txt 2>&1
