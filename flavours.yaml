@@ -130,8 +130,23 @@
 
 
 
+- name: ttZp
+  label: ttZp
+  cuts: []
+  colour: "#FF0000"
+  category: tttt-analysis
 - name: ttZp_mZp1000
   label: ttZp_mZp1000
+  cuts: []
+  colour: "#FF0000"
+  category: tttt-analysis
+- name: ttZp_mZp2000
+  label: ttZp_mZp2000
+  cuts: []
+  colour: "#FF0000"
+  category: tttt-analysis
+- name: ttZp_mZp3000
+  label: ttZp_mZp3000
   cuts: []
   colour: "#FF0000"
   category: tttt-analysis
@@ -165,13 +180,28 @@
   cuts: []
   colour: "#808080"
   category: tttt-analysis
+- name: ttW_bkg
+  label: ttW_bkg
+  cuts: []
+  colour: "#808080"
+  category: tttt-analysis
 - name: ttZ
   label: ttZ
   cuts: []
   colour:  "#C0C0C0"
   category: tttt-analysis
+- name: ttZ_bkg
+  label: ttZ_bkg
+  cuts: []
+  colour:  "#C0C0C0"
+  category: tttt-analysis
 - name: ttH
   label: ttH
+  cuts: []
+  colour: "#000000"
+  category: tttt-analysis
+- name: ttH_bkg
+  label: ttH_bkg
   cuts: []
   colour: "#000000"
   category: tttt-analysis

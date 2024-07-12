@@ -23,11 +23,15 @@ CLASS_NAMES = {
     #     "ttV",
     #     "otherbkg",
     # ],
+    # "flavour_label":[
+	# 	"ttZp",
+    #     "tttt_ttt",
+    #     "ttV",
+    #     "otherbkg",
+    # ],
     "flavour_label":[
-		"ttZp_mZp1000",
-        "tttt_ttt",
-        "ttV",
-        "otherbkg",
+		"ttZp",
+        "bkg",
     ],
     "truth_label":[
         "NonMatch",
