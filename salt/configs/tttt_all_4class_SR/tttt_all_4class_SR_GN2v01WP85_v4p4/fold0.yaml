@@ -194,7 +194,7 @@ data:
   num_workers: 40
 
 trainer:
-  max_epochs: 50
+  max_epochs: 20
   accelerator: gpu
   devices: 1
   precision: 16-mixed

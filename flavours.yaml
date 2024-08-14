@@ -150,6 +150,21 @@
   cuts: []
   colour: "#FF0000"
   category: tttt-analysis
+- name: ttH_mH400
+  label: ttH_mH400
+  cuts: []
+  colour: "#FF0000"
+  category: tttt-analysis
+- name: ttH_mH1000
+  label: ttH_mH1000
+  cuts: []
+  colour: "#FF0000"
+  category: tttt-analysis
+- name: ttH_mH2000
+  label: ttH_mH2000
+  cuts: []
+  colour: "#FF0000"
+  category: tttt-analysis
 - name: tttt_ttt
   label: tttt_ttt
   cuts: []

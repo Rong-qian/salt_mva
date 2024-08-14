@@ -29,9 +29,15 @@ CLASS_NAMES = {
     #     "ttV",
     #     "otherbkg",
     # ],
+    # "flavour_label":[
+	# 	"ttZp",
+    #     "bkg",
+    # ],
     "flavour_label":[
-		"ttZp",
-        "bkg",
+		"ttH",
+        "tttt_ttt",
+        "ttV",
+        "otherbkg",
     ],
     "truth_label":[
         "NonMatch",

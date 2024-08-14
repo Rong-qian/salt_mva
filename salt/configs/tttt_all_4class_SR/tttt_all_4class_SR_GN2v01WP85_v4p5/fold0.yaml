@@ -1,4 +1,4 @@
-name: tttt_all_4class_SR_GN2v01WP85_v4p4_fold1
+name: tttt_all_4class_SR_GN2v01WP85_v4p5_fold0
 
 model:
   lrs_config:
@@ -15,8 +15,8 @@ model:
         - input_name: tracks
           attach_global: True
           dense_config: &init
-            output_size: &embed_dim 32
-            hidden_layers: [32]
+            output_size: &embed_dim 64
+            hidden_layers: [32,64]
             activation: &activation ReLU
             # norm_layer: &# norm_layer LayerNorm
         # - input_name: EDGE
@@ -185,16 +185,16 @@ data:
     #   - msquare
 
 
-  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/preprocess_fold1/pp_output_train.h5
-  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/preprocess_fold1/pp_output_val.h5
-  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/preprocess_fold1/norm_dict.yaml
-  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/preprocess_fold1/class_dict.yaml
+  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold0/pp_output_train.h5
+  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold0/pp_output_val.h5
+  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold0/norm_dict.yaml
+  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold0/class_dict.yaml
 
   batch_size: 512
   num_workers: 40
 
 trainer:
-  max_epochs: 20
+  max_epochs: 50
   accelerator: gpu
   devices: 1
   precision: 16-mixed
