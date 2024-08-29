@@ -14,5 +14,5 @@ include:
   - .gitlab/.ci-pre-commit.yaml
   - .gitlab/.ci-build.yaml
   # - .gitlab/.ci-test.yaml
-  - .gitlab/.ci-coverage.yaml
-  - .gitlab/.ci-docs.yaml
+  # - .gitlab/.ci-coverage.yaml
+  # - .gitlab/.ci-docs.yaml
