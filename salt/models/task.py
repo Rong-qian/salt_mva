@@ -496,7 +496,7 @@ class VertexingTask(TaskBase):
         loss = self.loss(pred.squeeze(-1), match_matrix)
 
         # If reduction is none and have weight labels, weight the loss
-        origin_label = self.label.replace("VertexIndex", "OriginLabel")
+        # origin_label = self.label.replace("VertexIndex", "OriginLabel")
         # weights = self.get_weights(labels_dict[self.input_name][origin_label], adjmat)
         # weighted_loss = loss * weights
         weighted_loss = loss
