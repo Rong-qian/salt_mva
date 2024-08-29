@@ -1,0 +1,128 @@
+name: GNT_ttZp_mZp1000_Legacy77_SR_2class_edge_v04_00_0001_v3_fold7
+
+model:
+  lrs_config:
+    initial: 1e-5
+    max: 1e-3
+    end: 1e-9
+    pct_start: 0.05
+    weight_decay: 1e-5 # L2 regurization
+
+  model:
+    class_path: salt.models.SaltModel
+    init_args:
+      init_nets:
+        - input_name: concat_vector
+          dense_config: &init
+            output_size: &embed_dim 32
+            hidden_layers: [32]
+            activation: &activation ReLU
+            # norm_layer: &# norm_layer LayerNorm
+        - input_name: EDGE
+          attach_global: True
+          dense_config:
+            input_size: 8 #edge + n from jets branch?
+            output_size: &edge_embed_dim 64
+            hidden_layers: [64]
+            activation: *activation
+            # norm_layer: *# norm_layer
+
+      encoder:
+        class_path: salt.models.TransformerEncoder
+        init_args:
+          embed_dim: *embed_dim
+          edge_embed_dim: *edge_embed_dim
+          num_layers: 4
+          out_dim: &out_dim 128
+          update_edges: True
+          mha_config:
+            num_heads: 8
+            attention: { class_path: salt.models.ScaledDotProductAttention }
+          dense_config:
+            # norm_layer: *# norm_layer
+            activation: *activation
+            dropout: &dropout 0.1
+
+      pool_net:
+        class_path: salt.models.GlobalAttentionPooling
+        init_args: { input_size: *out_dim } # *out_dim + nGLOBAL
+
+      tasks:
+        class_path: torch.nn.ModuleList
+        init_args:
+          modules:
+            - class_path: salt.models.ClassificationTask
+              init_args:
+                name: jets_classification
+                input_name: jets
+                label: flavour_label
+                #use_class_dict_weights: True
+                #sample_weight: weight
+                loss:
+                  class_path: torch.nn.CrossEntropyLoss
+                  init_args: { weight: [16.42, 1.0] } # this is used to change the class weight, when use_class_dict_weights: False
+                dense_config: &task_dense_config
+                  input_size: 131 # *out_dim + nGLOBAL
+                  output_size: 2
+                  hidden_layers: [128, 64, 32]
+                  activation: *activation
+                  dropout: *dropout
+
+
+data:
+  input_map:
+    GLOBAL: jets
+    jets: jets
+    concat_vector: concat_vector
+    EDGE: concat_vector
+  variables:
+    GLOBAL:
+      - nJets
+      - nBTags_GN2v00LegacyWP_77
+      - HT_all
+    #  - SphericityJets
+    #  - SphericityXYJets
+    #  - met_met
+    #  - met_phi
+    jets:
+    #  - nJets
+    #  - nBTags_GN2v00LegacyWP_77
+    #  - HT_all
+    #  - SphericityJets
+    #  - SphericityXYJets
+      - met_met
+      - met_phi
+    concat_vector:
+      - pt
+      - eta
+      - phi
+      - e
+      - jet_tagWeightBin_Continuous
+      #- jet_raw_score
+      #- jet_raw_score_pb
+      #- jet_raw_score_pc
+      #- jet_raw_score_pu
+      - charge
+      - isTight
+      - DFCommonAddAmbiguity
+    EDGE:
+      - dR
+      - z
+      - kt
+      - deta
+      - dphi
+      - msquare
+
+  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/ttZp_analysis_Legacy77_SR_v3/preprocess_fold7/pp_output_train.h5
+  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/ttZp_analysis_Legacy77_SR_v3/preprocess_fold7/pp_output_val.h5
+  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/ttZp_analysis_Legacy77_SR_v3/preprocess_fold7/norm_dict.yaml
+  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/ttZp_analysis_Legacy77_SR_v3/preprocess_fold7/class_dict.yaml
+
+  batch_size: 128
+  num_workers: 40
+
+trainer:
+  max_epochs: 50
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed

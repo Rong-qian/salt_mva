@@ -129,9 +129,10 @@ class PredictionWriter(Callback):
         out_dir = Path(self.trainer.ckpt_path).parent
         out_basename = str(Path(self.trainer.ckpt_path).stem)
         stem = str(Path(self.ds.filename).stem)
-        sample = split[3] if len(split := stem.split("_")) == 4 else stem
-        suffix = f"_{self.test_suff}" if self.test_suff is not None else ""
-        return Path(out_dir / f"{out_basename}__test_{sample}{suffix}.h5")
+        # sample = split[3] if len(split := stem.split("_")) == 4 else stem
+        # suffix = f"_{self.test_suff}" if self.test_suff is not None else ""
+        # return Path(out_dir / f"{out_basename}__test_{sample}{suffix}.h5")
+        return Path(out_dir / f"{out_basename}__test_{stem}.h5")
 
     def on_test_batch_end(self, trainer, module, outputs, batch, batch_idx):  # noqa: ARG002
         preds = outputs

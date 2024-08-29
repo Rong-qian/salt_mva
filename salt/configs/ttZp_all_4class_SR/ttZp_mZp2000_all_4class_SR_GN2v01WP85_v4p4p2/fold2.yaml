@@ -1,0 +1,205 @@
+name: ttZp_mZp2000_all_4class_SR_GN2v01WP85_v4p4p2_fold2
+
+model:
+  lrs_config:
+    initial: 1e-5
+    max: 1e-3
+    end: 1e-9
+    pct_start: 0.025
+    weight_decay: 1e-5 # L2 regurization
+
+  model:
+    class_path: salt.models.SaltModel
+    init_args:
+      init_nets:
+        - input_name: tracks
+          attach_global: True
+          dense_config: &init
+            output_size: &embed_dim 32
+            hidden_layers: [32]
+            activation: &activation ReLU
+            # norm_layer: &# norm_layer LayerNorm
+        # - input_name: EDGE
+        #   attach_global: True
+        #   dense_config:
+        #     input_size: 8 #edge + n from jets branch?
+        #     output_size: &edge_embed_dim 64
+        #     hidden_layers: [64]
+        #     activation: *activation
+        #     # norm_layer: *# norm_layer
+
+      encoder:
+        class_path: salt.models.TransformerEncoder
+        init_args:
+          embed_dim: *embed_dim
+          # edge_embed_dim: *edge_embed_dim
+          num_layers: 4
+          out_dim: &out_dim 128
+          # update_edges: True
+          mha_config:
+            num_heads: 8
+            attention: { class_path: salt.models.ScaledDotProductAttention }
+          dense_config:
+            #norm_layer: *norm_layer
+            activation: *activation
+            dropout: &dropout 0.1
+
+      pool_net:
+        class_path: salt.models.GlobalAttentionPooling
+        init_args: { input_size: *out_dim } # *out_dim + nGLOBAL
+
+      tasks:
+        class_path: torch.nn.ModuleList
+        init_args:
+          modules:
+            - class_path: salt.models.ClassificationTask
+              init_args:
+                name: ttZp_classification
+                input_name: jets
+                label: flavour_label
+                loss:
+                  class_path: torch.nn.CrossEntropyLoss
+                  init_args: { weight: [5.797, 1.0, 2.35, 14.92] } # this is used to change the class weight, when use_class_dict_weights: False
+                dense_config: &task_dense_config
+                  # input_size: 131 # *out_dim + nGLOBAL
+                  input_size: *out_dim
+                  output_size: 4
+                  hidden_layers: [128, 64, 32]
+                  activation: *activation
+                  dropout: *dropout
+
+            - class_path: salt.models.ClassificationTask
+              init_args:
+                name: TruthBjet
+                input_name: tracks
+                label: isBottom  # -2:non-match 1:from_Top 2:from_Higgs
+                weight: 0.3
+                loss:
+                  class_path: torch.nn.CrossEntropyLoss
+                  init_args:
+                    weight: [1.0, 2.51]
+                dense_config:
+                  # input_size: 131
+                  input_size: *out_dim
+                  output_size: 2
+                  context_size: *out_dim
+                  hidden_layers: [128, 64, 32]
+                  activation: *activation
+                  dropout: *dropout
+
+            # - class_path: salt.models.ClassificationTask
+            #   init_args:
+            #     name: TruthOriginTask
+            #     input_name: tracks
+            #     label: truth_label  # -2:non-match 1:from_Top 2:from_Higgs
+            #     weight: 0.3
+            #     loss:
+            #       class_path: torch.nn.CrossEntropyLoss
+            #       init_args:
+            #         weight: [1.89, 1.0, 64.57]
+            #     dense_config:
+            #       # input_size: 131
+            #       input_size: *out_dim
+            #       output_size: 3
+            #       context_size: *out_dim
+            #       hidden_layers: [128, 64, 32]
+            #       activation: *activation
+            #       dropout: *dropout
+
+            # - class_path: salt.models.VertexingTask
+            #   init_args:
+            #     name: TruthVertex_Tops
+            #     input_name: tracks
+            #     label: vertex_Tops # -2:non-match 0:first_Top 1:second_Top
+            #     weight: 0.1
+            #     loss:
+            #       class_path: torch.nn.BCEWithLogitsLoss
+            #       init_args:
+            #         reduction: none
+            #         # weight: [1.0, 1.81, 1.83, 2.48, 2.95]
+            #     dense_config:
+            #       # input_size: 259
+            #       input_size: 256
+            #       output_size: 1
+            #       context_size: *out_dim #64
+            #       hidden_layers: [128, 64, 32]
+            #       activation: *activation
+            #       dropout: *dropout
+
+            # - class_path: salt.models.VertexingTask
+            #   init_args:
+            #     name: TruthVertex_Higgs
+            #     input_name: tracks
+            #     label: vertex_Higgs # -2:non-match 0:first_Higgs 1:second_Higgs
+            #     weight: 0.1
+            #     loss:
+            #       class_path: torch.nn.BCEWithLogitsLoss
+            #       init_args:
+            #         reduction: none
+            #         # weight: [1.0, 107.09, 1254.04]
+            #     dense_config:
+            #       # input_size: 259
+            #       input_size: 256
+            #       output_size: 1
+            #       context_size: *out_dim #64
+            #       hidden_layers: [128, 64, 32]
+            #       activation: *activation
+            #       dropout: *dropout
+
+
+data:
+  input_map:
+    # GLOBAL: jets
+    jets: jets
+    tracks: tracks
+    # EDGE: tracks
+  variables:
+    # GLOBAL:
+    #   - nJets
+    #   - nBTags_GN2v00LegacyWP_77
+    #   - HT_all
+    jets:
+      - nJets
+      - nBjets_GN2v01_85WP
+      - HT_all_NOSYS
+      - met_met_NOSYS
+      - met_phi_NOSYS
+    tracks:
+      - pt
+      - eta
+      - phi
+      - e
+      - PCBT
+      - charge
+      - isTight
+      - DFCommonAddAmbiguity
+      - isEl
+      - isMu
+      - isJet
+    # EDGE:
+    #   - dR
+    #   - z
+    #   - kt
+    #   - deta
+    #   - dphi
+    #   - msquare
+
+
+  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/ttZp_mZp2000/preprocess_fold2/pp_output_train.h5
+  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/ttZp_mZp2000/preprocess_fold2/pp_output_val.h5
+  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/ttZp_mZp2000/preprocess_fold2/norm_dict.yaml
+  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v1/ttZp_mZp2000/preprocess_fold2/class_dict.yaml
+
+  batch_size: 512
+  num_workers: 40
+
+trainer:
+  max_epochs: 50
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed
+
+  callbacks:
+    - class_path: salt.callbacks.PredictionWriter
+      init_args:
+        write_tracks: True
