@@ -92,12 +92,6 @@ def parse_args(args):
         help="Run with uncomitted changes.",
         action="store_true",
     )
-    parser.add_argument(
-        "-task_name",
-        "--task_name",
-        help="customalized classification task name",
-        required=False,
-    )
 
     return parser.parse_args(args)
 
@@ -467,7 +461,6 @@ def main(args=None):
             args.ckpt_path,
             onnx_feature_map=onnx_feature_map,
             name=args.name,
-            task_name=args.task_name,
             include_aux=args.include_aux,
             object_name=args.object_name,
             mf_config=mf_config,
