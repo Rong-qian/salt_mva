@@ -496,9 +496,10 @@ class VertexingTask(TaskBase):
         loss = self.loss(pred.squeeze(-1), match_matrix)
 
         # If reduction is none and have weight labels, weight the loss
-        origin_label = self.label.replace("VertexIndex", "OriginLabel")
-        weights = self.get_weights(labels_dict[self.input_name][origin_label], adjmat)
-        weighted_loss = loss * weights
+        # origin_label = self.label.replace("VertexIndex", "OriginLabel")
+        # weights = self.get_weights(labels_dict[self.input_name][origin_label], adjmat)
+        # weighted_loss = loss * weights
+        weighted_loss = loss
 
         # Calculate the number of non-masked elements
         num_non_masked_elements = match_matrix.sum()
@@ -518,7 +519,7 @@ class VertexingTask(TaskBase):
         preds = get_node_assignment_jit(preds, pad_mask)
         preds = mask_fill_flattened(preds, pad_mask)
         # dtype = np.dtype([("VertexIndex", "i8")])
-        dtype = np.dtype([("output_"+self.label, "i8")])  # !!!
+        dtype = np.dtype([("output_" + self.label, "i8")])  # !!!
         return u2s(preds.int().cpu().numpy(), dtype)
 
 
