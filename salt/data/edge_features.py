@@ -14,12 +14,6 @@ def get_dtype_edge(ds, variables) -> np.dtype:
     for variable in variables:
         if variable == "dR":
             req_vars.extend(["eta", "phi"])
-        elif variable == "deta":
-            req_vars.extend(["eta"])
-        elif variable == "dphi":
-            req_vars.extend(["phi"])
-        elif variable == "msquare":
-            req_vars.extend(["eta", "phi", "pt", "e"])
         elif variable == "z":
             req_vars.extend(["pt"])
         elif variable == "kt":
@@ -51,7 +45,7 @@ def get_inputs_edge(batch, variables):
 
     with np.errstate(divide="ignore"):
         # calculate useful intermediate quantities
-        if "dR" in variables or "deta" in variables or "dphi" in variables or "kt" in variables:
+        if "dR" in variables or "kt" in variables:
             dphi = np.expand_dims(batch["phi"].astype(ebatch.dtype), 1).repeat(
                 batch.shape[1], 1
             ) - np.expand_dims(batch["phi"].astype(ebatch.dtype), 2).repeat(batch.shape[1], 2)
@@ -64,54 +58,10 @@ def get_inputs_edge(batch, variables):
                 np.expand_dims(batch["pt"].astype(ebatch.dtype), 1).repeat(batch.shape[1], 1),
                 np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(batch.shape[1], 2),
             )
-        if "msquare" in variables:
-            Etot = np.expand_dims(batch["e"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1
-                ) + np.expand_dims(batch["e"].astype(ebatch.dtype), 2).repeat(
-                    batch.shape[1], 2)
-            pxtot = np.expand_dims(batch["pt"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1
-                ) * np.cos(np.expand_dims(batch["phi"].astype(ebatch.dtype), 1).repeat(
-                    batch.shape[1], 1
-                    )) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
-                        batch.shape[1], 2
-                        ) * np.cos(np.expand_dims(batch["phi"].astype(ebatch.dtype), 2).repeat(
-                            batch.shape[1], 2))
-            pytot = np.expand_dims(batch["pt"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1
-                ) * np.sin(np.expand_dims(batch["phi"].astype(ebatch.dtype), 1).repeat(
-                    batch.shape[1], 1
-                    )) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
-                        batch.shape[1], 2
-                        ) * np.sin(np.expand_dims(batch["phi"].astype(ebatch.dtype), 2).repeat(
-                            batch.shape[1], 2))
-            pztot = np.expand_dims(batch["pt"].astype(ebatch.dtype), 1).repeat(
-                batch.shape[1], 1
-                ) * np.sinh(np.expand_dims(batch["eta"].astype(ebatch.dtype), 1).repeat(
-                    batch.shape[1], 1
-                    )) + np.expand_dims(batch["pt"].astype(ebatch.dtype), 2).repeat(
-                        batch.shape[1], 2
-                        ) * np.sinh(np.expand_dims(batch["eta"].astype(ebatch.dtype), 2).repeat(
-                            batch.shape[1], 2))
         # calculate edge feature information and fill batch
         for i, variable in enumerate(variables):
             if variable == "dR":
                 ebatch[:, :, :, i] = np.log(np.sqrt(np.square(deta) + np.square(dphi)))
-            elif variable == "deta":
-                ebatch[:, :, :, i] = np.log(np.sqrt(np.square(deta)))
-            elif variable == "dphi":
-                ebatch[:, :, :, i] = np.log(np.sqrt(np.square(dphi)))
-            elif variable == "msquare":
-                E_minus_p = np.square(Etot) - \
-                (np.square(pxtot) + np.square(pytot) + np.square(pztot))
-                negative_mask = E_minus_p < 0
-                sqrt_E_minus_p = np.sqrt(np.abs(E_minus_p))
-                sqrt_E_minus_p[negative_mask] *= -1
-                # ebatch[:, :, :, i] = np.log(sqrt_E_minus_p)
-                mean = np.mean(sqrt_E_minus_p)
-                std_dev = np.std(sqrt_E_minus_p)
-                standardized_sqrt_E_minus_p = (sqrt_E_minus_p - mean) / std_dev
-                ebatch[:, :, :, i] = standardized_sqrt_E_minus_p
             elif variable == "kt":
                 ebatch[:, :, :, i] = np.log(pt_min * np.sqrt(np.square(deta) + np.square(dphi)))
             elif variable == "z":
