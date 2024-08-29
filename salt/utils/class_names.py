@@ -17,24 +17,8 @@ CLASS_NAMES = {
         "Electron",
         "Muon",
     ],
-    # "flavour_label":[
-	# 	"tttt",
-    #     "ttt",
-    #     "ttV",
-    #     "otherbkg",
-    # ],
-    # "flavour_label":[
-	# 	"ttZp",
-    #     "tttt_ttt",
-    #     "ttV",
-    #     "otherbkg",
-    # ],
-    # "flavour_label":[
-	# 	"ttZp",
-    #     "bkg",
-    # ],
     "flavour_label":[
-		"ttH",
+        "ttH",
         "tttt_ttt",
         "ttV",
         "otherbkg",
