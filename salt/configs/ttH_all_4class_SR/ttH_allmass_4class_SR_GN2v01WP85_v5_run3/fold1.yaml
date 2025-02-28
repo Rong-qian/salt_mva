@@ -1,4 +1,4 @@
-name: ttH_allmass_4class_SR_GN2v01WP85_v4p6_fold3
+name: ttH_allmass_4class_SR_GN2v01WP85_v5_run3_fold1
 
 model:
   lrs_config:
@@ -59,7 +59,7 @@ model:
                 label: flavour_label
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
-                  init_args: { weight: [1.0, 2.52, 5.94, 51.36] } # this is used to change the class weight, when use_class_dict_weights: False
+                  init_args: { weight: [1.33, 1.0, 5.07, 2.5] } # this is used to change the class weight, when use_class_dict_weights: False
                 dense_config: &task_dense_config
                   # input_size: 131 # *out_dim + nGLOBAL
                   input_size: *out_dim
@@ -77,7 +77,7 @@ model:
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
                   init_args:
-                    weight: [1.0, 2.32]
+                    weight: [1.0, 2.22]
                 dense_config:
                   # input_size: 131
                   input_size: *out_dim
@@ -87,44 +87,44 @@ model:
                   activation: *activation
                   dropout: *dropout
 
-            # - class_path: salt.models.ClassificationTask
-            #   init_args:
-            #     name: TruthOriginTask
-            #     input_name: tracks
-            #     label: truth_label  # -2:non-match 1:from_Top 2:from_Higgs
-            #     weight: 0.3
-            #     loss:
-            #       class_path: torch.nn.CrossEntropyLoss
-            #       init_args:
-            #         weight: [1.89, 1.0, 64.57]
-            #     dense_config:
-            #       # input_size: 131
-            #       input_size: *out_dim
-            #       output_size: 3
-            #       context_size: *out_dim
-            #       hidden_layers: [128, 64, 32]
-            #       activation: *activation
-            #       dropout: *dropout
+            - class_path: salt.models.ClassificationTask
+              init_args:
+                name: TruthOriginTask
+                input_name: tracks
+                label: isFromTop
+                weight: 0.3
+                loss:
+                  class_path: torch.nn.CrossEntropyLoss
+                  init_args:
+                    weight: [1.0, 1.37]
+                dense_config:
+                  # input_size: 131
+                  input_size: *out_dim
+                  output_size: 2
+                  context_size: *out_dim
+                  hidden_layers: [128, 64, 32]
+                  activation: *activation
+                  dropout: *dropout
 
-            # - class_path: salt.models.VertexingTask
-            #   init_args:
-            #     name: TruthVertex_Tops
-            #     input_name: tracks
-            #     label: vertex_Tops # -2:non-match 0:first_Top 1:second_Top
-            #     weight: 0.1
-            #     loss:
-            #       class_path: torch.nn.BCEWithLogitsLoss
-            #       init_args:
-            #         reduction: none
-            #         # weight: [1.0, 1.81, 1.83, 2.48, 2.95]
-            #     dense_config:
-            #       # input_size: 259
-            #       input_size: 256
-            #       output_size: 1
-            #       context_size: *out_dim #64
-            #       hidden_layers: [128, 64, 32]
-            #       activation: *activation
-            #       dropout: *dropout
+            - class_path: salt.models.VertexingTask
+              init_args:
+                name: TruthVertex_Tops
+                input_name: tracks
+                label: vertex_Tops # -2:non-match 0:first_Top 1:second_Top
+                weight: 0.1
+                loss:
+                  class_path: torch.nn.BCEWithLogitsLoss
+                  init_args:
+                    reduction: none
+                    # weight: [1.0, 1.81, 1.83, 2.48, 2.95]
+                dense_config:
+                  # input_size: 259
+                  input_size: 256
+                  output_size: 1
+                  context_size: *out_dim #64
+                  hidden_layers: [128, 64, 32]
+                  activation: *activation
+                  dropout: *dropout
 
             # - class_path: salt.models.VertexingTask
             #   init_args:
@@ -165,21 +165,15 @@ data:
       - nLeptons
       - met_met_NOSYS
       - met_phi_NOSYS
-      - isSR4b_NOSYS
-      - isSR2b2l_NOSYS
-      - isSR3b2l_NOSYS
-      - isSR2b3l4l_NOSYS
-      - isSR3b3l4l_NOSYS
-      - truthZpMass_NOSYS
+      - truthMass_NOSYS
     tracks:
       - pt
       - eta
       - phi
-      - e
+      # - e
       - PCBT
       - charge
-      - isTight
-      - DFCommonAddAmbiguity
+      # - DFCommonAddAmbiguity
       - isEl
       - isMu
       - isJet
@@ -192,10 +186,10 @@ data:
     #   - msquare
 
 
-  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_ttH_v3/ttH_all/preprocess_fold3/pp_output_train.h5
-  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_ttH_v3/ttH_all/preprocess_fold3/pp_output_val.h5
-  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_ttH_v3/ttH_all/preprocess_fold3/norm_dict.yaml
-  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_ttH_v3/ttH_all/preprocess_fold3/class_dict.yaml
+  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/p6491Nov24_v01/SR_4class_GN2v01WP85_run3_p6491_v1/ttH_all/preprocess_fold1/pp_output_train.h5
+  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/p6491Nov24_v01/SR_4class_GN2v01WP85_run3_p6491_v1/ttH_all/preprocess_fold1/pp_output_val.h5
+  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/p6491Nov24_v01/SR_4class_GN2v01WP85_run3_p6491_v1/ttH_all/preprocess_fold1/norm_dict.yaml
+  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/p6491Nov24_v01/SR_4class_GN2v01WP85_run3_p6491_v1/ttH_all/preprocess_fold1/class_dict.yaml
 
   batch_size: 512
   num_workers: 40
@@ -206,7 +200,7 @@ trainer:
   devices: 1
   precision: 16-mixed
 
-  callbacks:
-    - class_path: salt.callbacks.PredictionWriter
-      init_args:
-        write_tracks: True
+  # callbacks:
+  #   - class_path: salt.callbacks.PredictionWriter
+  #     init_args:
+  #       write_tracks: True
