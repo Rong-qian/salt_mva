@@ -1,4 +1,4 @@
-name: tttt_all_4class_SR_GN2v01WP85_v4p5_fold2
+name: tttt_all_4class_SR_GN2v01WP85_v4p5_fold2_run1
 
 model:
   lrs_config:
@@ -59,7 +59,7 @@ model:
                 label: flavour_label
                 loss:
                   class_path: torch.nn.CrossEntropyLoss
-                  init_args: { weight: [1.0, 3.47, 1.84, 11.54] } # this is used to change the class weight, when use_class_dict_weights: False
+                  init_args: { weight: [1.0, 3.16, 1.86, 5.63] } # this is used to change the class weight, when use_class_dict_weights: False
                 dense_config: &task_dense_config
                   # input_size: 131 # *out_dim + nGLOBAL
                   input_size: *out_dim
@@ -68,24 +68,24 @@ model:
                   activation: *activation
                   dropout: *dropout
 
-            - class_path: salt.models.ClassificationTask
-              init_args:
-                name: TruthBjet
-                input_name: tracks
-                label: isBottom  # -2:non-match 1:from_Top 2:from_Higgs
-                weight: 0.3
-                loss:
-                  class_path: torch.nn.CrossEntropyLoss
-                  init_args:
-                    weight: [1.0,2.54]
-                dense_config:
-                  # input_size: 131
-                  input_size: *out_dim
-                  output_size: 2
-                  context_size: *out_dim
-                  hidden_layers: [128, 64, 32]
-                  activation: *activation
-                  dropout: *dropout
+            # - class_path: salt.models.ClassificationTask
+            #   init_args:
+            #     name: TruthBjet
+            #     input_name: tracks
+            #     label: isBottom  # -2:non-match 1:from_Top 2:from_Higgs
+            #     weight: 0.3
+            #     loss:
+            #       class_path: torch.nn.CrossEntropyLoss
+            #       init_args:
+            #         weight: [1.0,2.54]
+            #     dense_config:
+            #       # input_size: 131
+            #       input_size: *out_dim
+            #       output_size: 2
+            #       context_size: *out_dim
+            #       hidden_layers: [128, 64, 32]
+            #       activation: *activation
+            #       dropout: *dropout
 
             # - class_path: salt.models.ClassificationTask
             #   init_args:
@@ -168,11 +168,8 @@ data:
       - pt
       - eta
       - phi
-      - e
       - PCBT
       - charge
-      - isTight
-      - DFCommonAddAmbiguity
       - isEl
       - isMu
       - isJet
@@ -185,10 +182,10 @@ data:
     #   - msquare
 
 
-  train_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold2/pp_output_train.h5
-  val_file: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold2/pp_output_val.h5
-  norm_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold2/norm_dict.yaml
-  class_dict: /lustre/umt3/user/huichil/analysis/run3_4top/mva/GN2/FullValidation_02/Test_SR_4class_GN2v01WP85_v2/tttt/preprocess_fold2/class_dict.yaml
+  train_file: /eos/user/c/ceimthur/MVA_training_tutorial/output/tttt/preprocess_fold0/pp_output_train.h5
+  val_file: /eos/user/c/ceimthur/MVA_training_tutorial/output/tttt/preprocess_fold0/pp_output_val.h5
+  norm_dict: /eos/user/c/ceimthur/MVA_training_tutorial/output/tttt/preprocess_fold0/norm_dict.yaml
+  class_dict: /eos/user/c/ceimthur/MVA_training_tutorial/output/tttt/preprocess_fold0/class_dict.yaml
 
   batch_size: 512
   num_workers: 40
