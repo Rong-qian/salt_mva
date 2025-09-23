@@ -15,8 +15,6 @@ plots/
 cern_configs/
 user/
 .vscode/launch.json
-salt/submit/submit_htcondor.py
-setup.sh
 
 *.pyc
 *.xml
