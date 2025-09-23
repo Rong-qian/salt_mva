@@ -31,7 +31,7 @@ handler["cpu"] = 1
 handler["gpu"] = 2
 handler["memory"] = 80_000  # 80 GiB - in MiB
 handler["runtime"] = 82800  # 23h - in seconds
-# handler["requirements"] = 'OpSysAndVer == "CentOS7"'
+handler["requirements"] = 'OpSysAndVer == "CentOS7"'
 
 # Run in singularity container?
 if args.environment == "singularity":
@@ -46,30 +46,16 @@ if args.environment == "singularity":
     handler["containerargs"] = f'"--nv --bind {storage_dir}"'
 
 # Construct and submit the job command
-# command = "cd ${BASEDIR} && export OMP_NUM_THREADS=1 && "
-# if args.environment == "conda":
-#     command += (
-#         "source /eos/user/c/ceimthur/MVA_training_tutorial/salt/conda/bin/activate && conda activate salt && " # use absolute value
-#         'echo "Activated environment ${CONDA_DEFAULT_ENV}" && '
-#     )
-# command += (
-#     'echo "CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES}" && '
-#     "cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1 && "
-#     "cd ${BASEDIR}/salt && pwd && "
-#     f"salt fit --config {args.config.resolve()}"
-# )
-# handler.send_job(command, args.tag)
-
-script_lines = [
-    "cd ${BASEDIR}",
-    "export OMP_NUM_THREADS=1",
-    "source /eos/user/c/ceimthur/MVA_training_tutorial/salt/conda/bin/activate",
-    "conda activate salt",
-    'echo "Activated environment ${CONDA_DEFAULT_ENV}"',
-    'echo "CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES}"',
-    "cd ${BASEDIR}/salt",
+command = "cd ${BASEDIR} && export OMP_NUM_THREADS=1 && "
+if args.environment == "conda":
+    command += (
+        "source conda/bin/activate && conda activate salt && "
+        'echo "Activated environment ${CONDA_DEFAULT_ENV}" && '
+    )
+command += (
+    'echo "CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES}" && '
+    "cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1 && "
+    "cd ${BASEDIR}/salt && pwd && "
     f"salt fit --config {args.config.resolve()}"
-]
-
-command = "\n".join(script_lines)
+)
 handler.send_job(command, args.tag)
