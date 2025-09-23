@@ -4,10 +4,10 @@
 # https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/ftag-tracking-studies/-/blob/master/setup_conda.sh
 
 # install mamba locally if it doesn't already exist
-CONDA_INSTALL=/eos/home-c/ceimthur/MVA_training_tutorial/salt/conda
+CONDA_INSTALL=$PWD/conda/
 
 if [[ ! -d "${CONDA_INSTALL}" ]]; then
-  CONDA_REPOSITORY=https://github.com/conda-forge/miniforge/releases/download/25.3.1-0
+  CONDA_REPOSITORY=https://github.com/conda-forge/miniforge/releases/latest/download
   # installation for macOS (including support for M1 MacBooks)
   if [[ $OSTYPE == 'darwin'* ]]; then
     MAC_TYPE="$(uname -m)"
@@ -18,7 +18,7 @@ if [[ ! -d "${CONDA_INSTALL}" ]]; then
     fi
   # installation for linux
   elif [[ $OSTYPE == 'linux'* ]]; then
-    CONDA_INSTALLER="Miniforge3-25.3.1-0-Linux-x86_64.sh"
+    CONDA_INSTALLER="Mambaforge-Linux-x86_64.sh"
   # other operating system not supported
   else
     echo "Operating system not supported. Setup not possible."
